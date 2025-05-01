@@ -1,0 +1,109 @@
+<div class="todo-container">
+  <mat-toolbar color="primary">
+    <span>TODO Application</span>
+    <span class="toolbar-spacer"></span>
+    <button mat-icon-button (click)="logout()">
+      <mat-icon>exit_to_app</mat-icon>
+    </button>
+  </mat-toolbar>
+
+  <div class="content">
+    <h1>TODO</h1>
+
+    <!-- Todo Form -->
+    <mat-card class="todo-form-card">
+      <mat-card-header>
+        <mat-card-title>Add New Todo</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="todoForm" (ngSubmit)="onSubmit()">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Title</mat-label>
+              <input matInput formControlName="title" type="text" required>
+              <mat-error *ngIf="todoForm.controls['title'].errors?.['required']">Title is required</mat-error>
+              <mat-error *ngIf="todoForm.controls['title'].errors?.['minlength']">Title must be at least 3 characters</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput formControlName="description" rows="3" required></textarea>
+              <mat-error *ngIf="todoForm.controls['description'].errors?.['required']">Description is required</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="form-row">
+            <button mat-raised-button color="primary" type="submit" [disabled]="todoForm.invalid || loading">
+              <mat-spinner *ngIf="loading" diameter="20" class="button-spinner"></mat-spinner>
+              <span *ngIf="!loading">Add Todo</span>
+            </button>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Todo Table -->
+    <div class="todo-table-container">
+      <h2>My Todos</h2>
+
+      <div *ngIf="loading" class="spinner-container">
+        <mat-spinner></mat-spinner>
+      </div>
+
+      <div *ngIf="!loading && todos.length === 0" class="no-todos">
+        <p>No todos found. Add your first todo above!</p>
+      </div>
+
+      <table mat-table [dataSource]="todos" class="mat-elevation-z8 full-width" *ngIf="!loading && todos.length > 0">
+        <!-- Serial Number Column -->
+        <ng-container matColumnDef="sn">
+          <th mat-header-cell *matHeaderCellDef>SN</th>
+          <td mat-cell *matCellDef="let todo; let i = index">{{ i + 1 }}</td>
+        </ng-container>
+
+        <!-- Title Column -->
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Title</th>
+          <td mat-cell *matCellDef="let todo">{{ todo.title }}</td>
+        </ng-container>
+
+        <!-- Description Column -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef>Description</th>
+          <td mat-cell *matCellDef="let todo">{{ todo.description }}</td>
+        </ng-container>
+
+        <!-- Created At Column -->
+        <ng-container matColumnDef="created_at">
+          <th mat-header-cell *matHeaderCellDef>Created At</th>
+          <td mat-cell *matCellDef="let todo">{{ todo.created_at | date:'medium' }}</td>
+        </ng-container>
+
+        <!-- Completed Column -->
+        <ng-container matColumnDef="completed">
+          <th mat-header-cell *matHeaderCellDef>Completed</th>
+          <td mat-cell *matCellDef="let todo">
+            <mat-checkbox
+              [checked]="todo.completed"
+              (change)="updateTodoStatus(todo)"
+              color="primary">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let todo">
+            <button mat-icon-button color="warn" (click)="deleteTodo(todo.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+  </div>
+</div>
