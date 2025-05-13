@@ -4,3 +4,7 @@ services:
     env: static
     staticPublishPath: dist/todo
     buildCommand: npm install && npm run build -- --configuration=production
+    headers:
+      - path: /*
+        name: "Cache-Control"
+        value: "no-cache"
